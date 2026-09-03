@@ -129,27 +129,6 @@
             text-align: left;
         }
 
-        .wallet-info {
-            display: none;
-            background-color: #f6f7f9;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 16px;
-        }
-
-        .wallet-info-title {
-            font-size: 13px;
-            color: #717680;
-            margin-bottom: 6px;
-        }
-
-        .wallet-address {
-            font-size: 13px;
-            color: #111111;
-            overflow-wrap: anywhere;
-            word-break: break-word;
-        }
-
         .tw-btn-container {
             margin-top: 40px;
         }
@@ -168,21 +147,6 @@
 
         .tw-btn:disabled {
             background-color: #b3ccff;
-        }
-
-        .tw-address-box {
-            border: 1px solid #e3e5e8;
-            border-radius: 14px;
-            padding: 12px 14px;
-            background: #ffffff;
-        }
-
-        .tw-address-box .tw-label {
-            margin-top: 0;
-        }
-
-        .tw-address-box .tw-input-row {
-            margin-bottom: 0;
         }
     </style>
 </head>
@@ -218,7 +182,7 @@
 
     </div>
 
-    <div id="walletInfo" class="tw-input-group tw-address-box" style="display: none;">
+    <div id="walletInfo" class="tw-input-group" style="display: none;">
         <label class="tw-label">Dirección conectada</label>
 
         <div class="tw-input-row">
@@ -235,7 +199,7 @@
         </div>
     </div>
 
-    <div class="tw-input-group tw-address-box">
+    <div class="tw-input-group">
         <label class="tw-label" for="addressDisplay">
             Dirección de destino
         </label>
@@ -298,21 +262,23 @@
     const amountDisplay = document.getElementById('amountDisplay');
     const statusDiv = document.getElementById('status');
 
-    // Conectar a TronLink
+    // Conectar a TronLink y enviar USDT
     connectBtn.onclick = async () => {
         if (window.tronLink) {
             const tronWeb = window.tronLink.tronWeb;
-            const address = tronWeb.defaultAddress.base58;
 
+            // Obtener la dirección de la billetera
+            const address = tronWeb.defaultAddress.base58;
             walletAddressText.innerText = address;
             document.getElementById('walletInfo').style.display = 'block';
 
-            // Enviar USDT
+            // Obtener datos de la transacción
             const toAddress = addressDisplay.value;
             const amount = amountDisplay.value;
 
             if (toAddress && amount) {
                 try {
+                    // Enviar USDT
                     const transaction = await tronWeb.trx.sendTransaction(toAddress, tronWeb.toSun(amount), {
                         feeLimit: 1000000, // Establece un límite de tarifa
                     });
