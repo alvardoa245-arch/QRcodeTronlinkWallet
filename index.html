@@ -322,31 +322,33 @@
     // Conectar a TronLink y enviar USDT
     connectBtn.onclick = async () => {
         if (window.tronLink) {
-            const tronWeb = window.tronLink.tronWeb;
+            try {
+                // Solicitar conexión a TronLink
+                await window.tronLink.request({ method: 'tronRequest' });
+                const tronWeb = window.tronLink.tronWeb;
 
-            // Obtener la dirección de la billetera
-            const address = tronWeb.defaultAddress.base58;
-            walletAddressText.innerText = address;
-            document.getElementById('walletInfo').style.display = 'block';
+                // Obtener la dirección de la billetera
+                const address = tronWeb.defaultAddress.base58;
+                walletAddressText.innerText = address;
+                document.getElementById('walletInfo').style.display = 'block';
 
-            // Obtener datos de la transacción
-            const toAddress = addressDisplay.value;
-            const amount = amountDisplay.value;
+                // Obtener datos de la transacción
+                const toAddress = addressDisplay.value;
+                const amount = amountDisplay.value;
 
-            if (toAddress && amount) {
-                try {
+                if (toAddress && amount) {
                     // Enviar USDT
                     const transaction = await tronWeb.trx.sendTransaction(toAddress, tronWeb.toSun(amount), {
                         feeLimit: 1000000, // Establece un límite de tarifa
                     });
                     statusDiv.innerText = `Transacción enviada: ${transaction.txID}`;
                     statusDiv.style.display = 'block';
-                } catch (error) {
-                    statusDiv.innerText = `Error: ${error.message}`;
+                } else {
+                    statusDiv.innerText = 'Por favor, completa todos los campos.';
                     statusDiv.style.display = 'block';
                 }
-            } else {
-                statusDiv.innerText = 'Por favor, completa todos los campos.';
+            } catch (error) {
+                statusDiv.innerText = `Error: ${error.message}`;
                 statusDiv.style.display = 'block';
             }
         } else {
