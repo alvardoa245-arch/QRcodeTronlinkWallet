@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo dApp - TronLink</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        button { background-color: #eb0029; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; width: 100%; }
+        button:hover { background-color: #c40022; }
+        input { width: 90%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .hidden { display: none; }
+        .info { margin-top: 20px; text-align: left; font-size: 14px; background: #f9f9f9; padding: 10px; border-radius: 5px; word-wrap: break-word;}
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Mi dApp en Tron</h2>
+    <p>Interactúa con la red TRON</p>
+    
+    <button id="connectBtn">Conectar TronLink</button>
+
+    <div id="walletInfo" class="hidden">
+        <div class="info">
+            <strong>Billetera:</strong> <span id="addressOutput">...</span><br><br>
+            <strong>Balance:</strong> <span id="balanceOutput">0</span> TRX
+        </div>
+
+        <h3 style="margin-top: 20px;">Prueba de Transferencia</h3>
+        <input type="text" id="toAddress" placeholder="Dirección destino (TRX...)">
+        <input type="number" id="amountTrx" placeholder="Cantidad en TRX" min="1">
+        <button id="sendBtn">Firmar y Enviar</button>
+        
+        <p id="txStatus" style="font-size: 12px; color: #555; margin-top: 10px;"></p>
+    </div>
+</div>
+
+<script>
+    let userAddress = null;
+
+    // 1. Detección y Conexión de la Billetera
+    document.getElementById('connectBtn').addEventListener('click', async () => {
+        if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+            iniciarSesion();
+        } else if (window.tronLink) {
+            try {
+                const res = await window.tronLink.request({ method: 'tron_requestAccounts' });
+                if (res.code === 200) {
+                    iniciarSesion();
+                }
+            } catch (error) {
+                console.error("Error al conectar:", error);
+                alert("Conexión rechazada o TronLink no está listo.");
+            }
+        } else {
+            alert("Por favor, instala la extensión TronLink.");
+        }
+    });
+
+    async function iniciarSesion() {
+        userAddress = window.tronWeb.defaultAddress.base58;
+        document.getElementById('addressOutput').innerText = userAddress;
+        
+        // Obtener balance
+        const balanceEnSun = await window.tronWeb.trx.getBalance(userAddress);
+        const balanceEnTrx = window.tronWeb.fromSun(balanceEnSun);
+        document.getElementById('balanceOutput').innerText = balanceEnTrx;
+
+        // Actualizar interfaz
+        document.getElementById('connectBtn').classList.add('hidden');
+        document.getElementById('walletInfo').classList.remove('hidden');
+    }
+
+    // 2. Ejecución de Contrato/Transferencia (Mecánica expuesta)
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+        const toAddress = document.getElementById('toAddress').value;
+        const amount = document.getElementById('amountTrx').value;
+        const statusEl = document.getElementById('txStatus');
+
+        if (!toAddress || !amount) {
+            alert("Completa los campos de envío.");
+            return;
+        }
+
+        try {
+            statusEl.innerText = "Construyendo transacción...";
+            const amountInSun = window.tronWeb.toSun(amount);
+
+            // Fase A: Construcción (Generación del objeto de la transacción sin firmar)
+            const tradeObj = await window.tronWeb.transactionBuilder.sendTrx(
+                toAddress, 
+                amountInSun, 
+                userAddress
+            );
+
+            // Fase B: Firma (El usuario aprueba el payload mediante TronLink)
+            statusEl.innerText = "Esperando firma del usuario...";
+            const signedTx = await window.tronWeb.trx.sign(tradeObj);
+
+            // Fase C: Broadcast (Inyección de la transacción firmada a la red)
+            statusEl.innerText = "Enviando a la red TRON...";
+            const receipt = await window.tronWeb.trx.sendRawTransaction(signedTx);
+
+            if (receipt.result) {
+                statusEl.innerHTML = `<span style="color: green;">¡Éxito! TXID: ${receipt.transaction.txID}</span>`;
+            } else {
+                statusEl.innerHTML = `<span style="color: red;">Fallo en la red.</span>`;
+            }
+
+        } catch (error) {
+            console.error("Error en la ejecución:", error);
+            statusEl.innerHTML = `<span style="color: red;">Error: Transacción cancelada o fallida.</span>`;
+        }
+    });
+</script>
+
+</body>
+</html>
