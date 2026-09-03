@@ -348,7 +348,8 @@
                     statusDiv.style.display = 'block';
                 }
             } catch (error) {
-                statusDiv.innerText = `Error: ${error.message}`;
+                // Manejo de errores mejorado
+                statusDiv.innerText = `Error: ${error.message || 'Error desconocido'}`;
                 statusDiv.style.display = 'block';
             }
         } else {
